@@ -17,6 +17,7 @@ import org.geoserver.platform.resource.Resource;
 import org.geoserver.platform.resource.Resource.Type;
 import org.geoserver.platform.resource.ResourceListener;
 import org.geoserver.platform.resource.ResourceNotification;
+import org.geoserver.wcs.responses.CoverageResponseDelegate;
 import org.geotools.util.logging.Logging;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
@@ -34,6 +35,9 @@ import com.thoughtworks.xstream.XStream;
 public class GdalConfigurator implements ApplicationListener<ContextClosedEvent> {
     private static final Logger LOGGER = Logging.getLogger(GdalConfigurator.class);
 
+    /**
+     * The {@link CoverageResponseDelegate} implementation doing the actual conversion
+     */
     public GdalCoverageResponseDelegate responseDelegate;
 
     GdalWrapper wrapper;

@@ -9,14 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Parameters defining an output format generated using gdal_translate from a GeoTIFF dump
+ * Parameters defining an output format generated using gdal_translate from a GeoTIFF dump.
  *
  * @author Stefano Costa, GeoSolutions
  *
  */
 public class GdalFormat {
     /**
-     * The ??? parameter
+     * The gdal_translate -of parameter
      */
     public String gdalFormat;
 
@@ -50,6 +50,15 @@ public class GdalFormat {
      */
     public String mimeType;
 
+    /**
+     * @param gdalFormat
+     * @param formatName
+     * @param fileExtension
+     * @param singleFile
+     * @param mimeType
+     * @param type
+     * @param options
+     */
     public GdalFormat(String gdalFormat, String formatName, String fileExtension, boolean singleFile,
             String mimeType, GdalType type, String... options) {
         this.gdalFormat = gdalFormat;
@@ -66,6 +75,14 @@ public class GdalFormat {
         }
     }
 
+    /**
+     * @param gdalFormat
+     * @param formatName
+     * @param fileExtension
+     * @param singleFile
+     * @param mimeType
+     * @param options
+     */
     public GdalFormat(String gdalFormat, String formatName, String fileExtension, boolean singleFile,
             String mimeType, String... options) {
         this(gdalFormat, formatName, fileExtension, singleFile, mimeType, GdalType.BINARY, options);

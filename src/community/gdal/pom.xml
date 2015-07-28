@@ -21,6 +21,6 @@
 
   <modules>
     <module>gdal-wcs</module> 
-<!--    <module>gdal-wps</module>-->
+    <module>gdal-wps</module>
   </modules>
 </project>

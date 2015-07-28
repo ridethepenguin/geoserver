@@ -1,3 +1,8 @@
+/* (c) 2015 Open Source Geospatial Foundation - all rights reserved
+ * This code is licensed under the GPL 2.0 license, available at the root
+ * application directory.
+ */
+
 package org.geoserver.wcs.response;
 
 import static org.junit.Assert.assertEquals;
@@ -80,6 +85,8 @@ public class GdalWcsTest extends WCSKVPTestSupport {
 
         //assertEquals("application/zip", response.getContentType());
         assertEquals("GDAL-ArcInfoGrid", response.getContentType());
+
+        GdalTestUtil.checkZippedGridData(getBinaryInputStream(response));
     }
 
     @Test
@@ -87,10 +94,12 @@ public class GdalWcsTest extends WCSKVPTestSupport {
         assumeTrue(isFormatSupported("text/plain"));
 
         MockHttpServletResponse response = getAsServletResponse("wcs?request=GetCoverage&service=WCS&version=2.0.1"
-                + "&coverageId=BlueMarble&Format=GDAL-XYZ");
+                + "&coverageId=DEM&Format=GDAL-XYZ");
 
         //assertEquals("text/plain", response.getContentType());
         assertEquals("GDAL-XYZ", response.getContentType());
+
+        GdalTestUtil.checkXyzData(getBinaryInputStream(response));
     }
 
 }

@@ -8,7 +8,7 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * Represents the gdal_translate output format configuration as a whole.
- * Only used for XStream driven de-serialization
+ * Only used for XStream driven de-serialization.
  * 
  * @author Stefano Costa, GeoSolutions
  */
@@ -27,8 +27,17 @@ public class GdalConfiguration {
         };
     }
 
+    /**
+     * The full path to gdal_translate
+     */
     public String gdalTranslateLocation;
+    /**
+     * The full path of the GDAL_DATA folder
+     */
     public String gdalData;
+    /**
+     * The configured output formats 
+     */
     public GdalFormat[] formats;
 
     public static void main(String[] args) {

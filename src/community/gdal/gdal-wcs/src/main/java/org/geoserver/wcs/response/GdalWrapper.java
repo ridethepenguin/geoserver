@@ -23,7 +23,7 @@ import org.geotools.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Helper used to invoke gdal_translate
+ * Helper used to invoke gdal_translate.
  * 
  * @author Stefano Costa, GeoSolutions
  * 
@@ -35,6 +35,10 @@ public class GdalWrapper {
     private String gdalTranslateExecutable;
     private String gdalData;
 
+    /**
+     * @param gdalTranslateExecutable full path to gdal_translate
+     * @param gdalData full path to GDAL_DATA folder
+     */
     public GdalWrapper(String gdalTranslateExecutable, String gdalData) {
         this.gdalTranslateExecutable = gdalTranslateExecutable;
         this.gdalData = gdalData;
@@ -97,7 +101,7 @@ public class GdalWrapper {
     }
 
     /**
-     * Returns a list of the gdal_translate supported formats
+     * Returns a list of the gdal_translate supported formats (i.e. what must be passed to gdal_translate via its -of parameter)
      * 
      * @return
      */
@@ -120,6 +124,14 @@ public class GdalWrapper {
         }
     }
 
+    /**
+     * Runs the provided command and parses its output to extract a set of supported formats. 
+     *  
+     * @param commands the command to run
+     * @param formats the parsed formats will be added to this set 
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void addFormats(List<String> commands, Set<String> formats) throws IOException,
             InterruptedException {
         StringBuilder sb = new StringBuilder();

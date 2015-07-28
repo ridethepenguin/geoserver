@@ -33,10 +33,31 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.vfny.geoserver.wcs.WcsException;
 
+/**
+ * Implementation of {@link CoverageResponseDelegate} that leverages the gdal_translate utility to encode coverages in any output format supported by the
+ * GDAL library available on the system where GeoServer is running.
+ * 
+ * <p>
+ * The encoding process involves two steps:
+ * <ol>
+ * <li>the coverage passed as input to the <code>encode()</code> method is dumped to a temporary file on disk in GeoTIFF format</li>
+ * <li>the <code>gdal_translate</code> command is invoked with the provided options to convert the dumped GeoTIFF file to the desired format</li>
+ * </ol>
+ * </p>
+ * 
+ * <p>
+ * Configuration for the supported output formats must be passed to the class via its {@link #addFormat(GdalFormat)} method.
+ * </p>
+ * 
+ * @author Stefano Costa, GeoSolutions
+ */
 public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
 
     private static final GeoTiffFormat GEOTIF_FORMAT = new GeoTiffFormat();
 
+    /**
+     * Facade to GeoServer's configuration
+     */
     GeoServer geoServer;
 
     /**
@@ -68,6 +89,9 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      */
     private ReadWriteLock formatsLock;
 
+    /**
+     * @param gs
+     */
     public GdalCoverageResponseDelegate(GeoServer gs) {
         this.formatsLock = new ReentrantReadWriteLock();
         this.geoServer = gs;
@@ -296,24 +320,14 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
 
             // was it a single file output?
             if(format.singleFile) {
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(outputFile);
+                try (FileInputStream fis = new FileInputStream(outputFile)) {
                     org.apache.commons.io.IOUtils.copy(fis, output);
-                } finally {
-                    if(fis != null) {
-                        fis.close();
-                    }
                 }
             } else {
                 // scan the output directory and zip it all
-                ZipOutputStream zipOut = null;
-                try {
-                    zipOut = new ZipOutputStream(output);
+                try (ZipOutputStream zipOut = new ZipOutputStream(output)) {
                     IOUtils.zipDirectory(tempGDAL, zipOut, null);
                     zipOut.finish();
-                } finally {
-                    org.apache.commons.io.IOUtils.closeQuietly(zipOut);
                 }
             }
         } catch (Exception e) {
@@ -392,7 +406,6 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
 
     @Override
     public String getConformanceClass(String format) {
-        // TODO: what more meaningful string should I put here?
         return "http://www.opengis.net/spec/WCS_coverage-encoding-x" + getMimeType(format);
     }
 

@@ -197,6 +197,7 @@
         <module>sldService</module>
         <module>release</module>
 	<module>gwc-distributed</module>
+	<module>gdal</module>
       </modules>
     </profile>
     <profile>
@@ -449,6 +450,12 @@
         <modules>
           <module>vectortiles</module>
         </modules>
-    </profile>    
+    </profile>
+    <profile>
+      <id>gdal-translate</id>
+        <modules>
+          <module>gdal</module>
+        </modules>
+    </profile>
   </profiles>
 </project>

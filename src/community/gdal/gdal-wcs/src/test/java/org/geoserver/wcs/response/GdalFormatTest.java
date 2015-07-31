@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.geoserver.config.impl.GeoServerImpl;
+import org.geoserver.ogr.core.Format;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.GridCoverage2DReader;
 import org.geotools.gce.geotiff.GeoTiffReader;
@@ -37,12 +38,12 @@ public class GdalFormatTest {
         // the coverage response delegate
         gdalCovRespDelegate = new GdalCoverageResponseDelegate(new GeoServerImpl());
         // add default formats
-        for (GdalFormat format : GdalConfiguration.DEFAULT.formats) {
+        for (Format format : GdalConfigurator.DEFAULT.getFormats()) {
             gdalCovRespDelegate.addFormat(format);
         }
 
-        gdalCovRespDelegate.setGdalTranslateExecutable(GdalTestUtil.getGdalTranslate());
-        gdalCovRespDelegate.setGdalData(GdalTestUtil.getGdalData());
+        gdalCovRespDelegate.setExecutable(GdalTestUtil.getGdalTranslate());
+        gdalCovRespDelegate.setEnvironment(GdalTestUtil.getGdalData());
     }
 
     @Test

@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +69,7 @@ public class GdalTestUtil {
                     GDAL_TRANSLATE = "gdal_translate";
                 GDAL_DATA = p.getProperty("gdalData");
                 
-                GdalWrapper gdal = new GdalWrapper(GDAL_TRANSLATE, GDAL_DATA);
+                GdalWrapper gdal = new GdalWrapper(GDAL_TRANSLATE, Collections.singletonMap("GDAL_DATA", GDAL_DATA));
                 IS_GDAL_AVAILABLE = gdal.isAvailable();
             } catch (Exception e) {
                 IS_GDAL_AVAILABLE = false;
@@ -87,11 +89,11 @@ public class GdalTestUtil {
             return null;
     }
     
-    public static String getGdalData() {
+    public static Map<String, String> getGdalData() {
         if(isGdalAvailable())
-            return GDAL_DATA;
+            return Collections.singletonMap("GDAL_DATA", GDAL_DATA);
         else
-            return null;
+            return Collections.emptyMap();
     }
     
 

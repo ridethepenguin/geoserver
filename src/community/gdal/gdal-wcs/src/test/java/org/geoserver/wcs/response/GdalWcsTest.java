@@ -20,8 +20,8 @@ public class GdalWcsTest extends WCSKVPTestSupport {
     @Before
     public void setup() {
         assumeTrue(GdalTestUtil.isGdalAvailable());
-        GdalConfiguration.DEFAULT.gdalTranslateLocation = GdalTestUtil.getGdalTranslate();
-        GdalConfiguration.DEFAULT.gdalData = GdalTestUtil.getGdalData();
+        GdalConfigurator.DEFAULT.setExecutable(GdalTestUtil.getGdalTranslate());
+        GdalConfigurator.DEFAULT.setEnvironment(GdalTestUtil.getGdalData());
 
         // force reload of the config, some tests may alter it
         GdalConfigurator configurator = applicationContext.getBean(GdalConfigurator.class);

@@ -16,10 +16,9 @@ import java.util.zip.ZipInputStream;
 
 import org.geoserver.data.test.MockData;
 import org.geoserver.data.test.SystemTestData;
-import org.geoserver.wcs.response.GdalConfiguration;
+import org.geoserver.ogr.core.Format;
 import org.geoserver.wcs.response.GdalConfigurator;
 import org.geoserver.wcs.response.GdalCoverageResponseDelegate;
-import org.geoserver.wcs.response.GdalFormat;
 import org.geoserver.wcs.response.GdalTestUtil;
 import org.geoserver.wps.WPSTestSupport;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -47,8 +46,8 @@ public class GdalWpsTest extends WPSTestSupport {
     public void setUp() throws Exception {
         Assume.assumeTrue(GdalTestUtil.isGdalAvailable());
 
-        GdalConfiguration.DEFAULT.gdalTranslateLocation = GdalTestUtil.getGdalTranslate();
-        GdalConfiguration.DEFAULT.gdalData = GdalTestUtil.getGdalData();
+        GdalConfigurator.DEFAULT.setExecutable(GdalTestUtil.getGdalTranslate());
+        GdalConfigurator.DEFAULT.setEnvironment(GdalTestUtil.getGdalData());
 
         // force reload of the config, some tests may alter it
         GdalConfigurator configurator = applicationContext.getBean(GdalConfigurator.class);
@@ -62,9 +61,9 @@ public class GdalWpsTest extends WPSTestSupport {
         Document d = getAsDOM(root()
                 + "service=wps&request=describeprocess&identifier=gs:CropCoverage");
         String base = "/wps:ProcessDescriptions/ProcessDescription/ProcessOutputs";
-        for (GdalFormat f : delegate.getFormats()) {
+        for (Format f : delegate.getFormats()) {
             assertXpathExists(base + "/Output[1]/ComplexOutput/Supported/Format[MimeType='"
-                        + delegate.getMimeType(f.formatName) + "; subtype=" + f.formatName + "']", d);
+                        + delegate.getMimeType(f.getGeoserverFormat()) + "; subtype=" + f.getGeoserverFormat() + "']", d);
         }
     }
 

@@ -8,8 +8,8 @@ package org.geoserver.wps.gdal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geoserver.ogr.core.Format;
 import org.geoserver.wcs.response.GdalCoverageResponseDelegate;
-import org.geoserver.wcs.response.GdalFormat;
 import org.geoserver.wps.ppio.PPIOFactory;
 import org.geoserver.wps.ppio.ProcessParameterIO;
 
@@ -27,25 +27,25 @@ public class GdalPPIOFactory implements PPIOFactory {
     @Override
     public List<ProcessParameterIO> getProcessParameterIO() {
         List<ProcessParameterIO> gdalParams = new ArrayList<ProcessParameterIO>();
-        for (GdalFormat of : this.delegate.getFormats()) {
+        for (Format of : this.delegate.getFormats()) {
             ProcessParameterIO ppio = null;
-            String computedMimeType = delegate.getMimeType(of.formatName);
-            if (of.formatName != null && !of.formatName.isEmpty()) {
-                computedMimeType = computedMimeType + "; subtype=" + of.formatName;
+            String computedMimeType = delegate.getMimeType(of.getGeoserverFormat());
+            if (of.getGeoserverFormat() != null && !of.getGeoserverFormat().isEmpty()) {
+                computedMimeType = computedMimeType + "; subtype=" + of.getGeoserverFormat();
             }
-            if (of.type == null) {
+            if (of.getType() == null) {
                 // binary is the default type
-                ppio = new GdalBinaryPPIO(of.formatName, delegate, computedMimeType);
+                ppio = new GdalBinaryPPIO(of.getGeoserverFormat(), delegate, computedMimeType);
             } else {
-                switch (of.type) {
+                switch (of.getType()) {
                 case BINARY:
-                    ppio = new GdalBinaryPPIO(of.formatName, delegate, computedMimeType);
+                    ppio = new GdalBinaryPPIO(of.getGeoserverFormat(), delegate, computedMimeType);
                     break;
                 case TEXT:
-                    ppio = new GdalCDataPPIO(of.formatName, delegate, computedMimeType);
+                    ppio = new GdalCDataPPIO(of.getGeoserverFormat(), delegate, computedMimeType);
                     break;
                 case XML:
-                    ppio = new GdalXMLPPIO(of.formatName, delegate);
+                    ppio = new GdalXMLPPIO(of.getGeoserverFormat(), delegate);
                     break;
                 default:
                     break;

@@ -1,42 +1,42 @@
-<GdalConfiguration>
+<ToolConfiguration>
     <gdalTranslateLocation>gdal_translate</gdalTranslateLocation>
     <!-- <gdalData>...</gdalData> -->
     <formats>
         <Format>
-            <gdalFormat>JP2ECW</gdalFormat>
-            <formatName>GDAL-JPEG2000</formatName>
+            <toolFormat>JP2ECW</toolFormat>
+            <geoserverFormat>GDAL-JPEG2000</geoserverFormat>
             <fileExtension>.jp2</fileExtension>
             <singleFile>true</singleFile>
             <mimeType>image/jp2</mimeType>
             <type>binary</type> <!-- not really required, it’s the default -->
         </Format>
         <Format>
-            <gdalFormat>PDF</gdalFormat>
-            <formatName>GDAL-PDF</formatName>
+            <toolFormat>PDF</toolFormat>
+            <geoserverFormat>GDAL-PDF</geoserverFormat>
             <fileExtension>.pdf</fileExtension>
             <singleFile>true</singleFile>
             <mimeType>application/pdf</mimeType>
         </Format>
         <Format>
-            <gdalFormat>MrSID</gdalFormat>
-            <formatName>GDAL-MrSID</formatName>
+            <toolFormat>MrSID</toolFormat>
+            <geoserverFormat>GDAL-MrSID</geoserverFormat>
             <fileExtension>.sid</fileExtension>
             <singleFile>true</singleFile>
             <mimeType>image/x-mrsid</mimeType>
         </Format>
         <Format>
-            <gdalFormat>AAIGrid</gdalFormat>
-            <formatName>GDAL-ArcInfoGrid</formatName>
+            <toolFormat>AAIGrid</toolFormat>
+            <geoserverFormat>GDAL-ArcInfoGrid</geoserverFormat>
             <fileExtension>.asc</fileExtension>
             <singleFile>false</singleFile>
         </Format>
         <Format>
-            <gdalFormat>XYZ</gdalFormat>
-            <formatName>GDAL-XYZ</formatName>
+            <toolFormat>XYZ</toolFormat>
+            <geoserverFormat>GDAL-XYZ</geoserverFormat>
             <fileExtension>.txt</fileExtension>
             <singleFile>true</singleFile>
             <mimeType>text/plain</mimeType>
             <type>text</type>
         </Format>
     </formats>
-</GdalConfiguration>
+</ToolConfiguration>

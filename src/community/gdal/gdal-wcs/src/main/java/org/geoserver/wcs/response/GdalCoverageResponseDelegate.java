@@ -19,6 +19,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.geoserver.config.GeoServer;
 import org.geoserver.data.util.IOUtils;
+import org.geoserver.ogr.core.Format;
+import org.geoserver.ogr.core.FormatConverter;
 import org.geoserver.platform.ServiceException;
 import org.geoserver.wcs.WCSInfo;
 import org.geoserver.wcs.responses.CoverageResponseDelegate;
@@ -51,7 +53,7 @@ import org.vfny.geoserver.wcs.WcsException;
  * 
  * @author Stefano Costa, GeoSolutions
  */
-public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
+public class GdalCoverageResponseDelegate implements CoverageResponseDelegate, FormatConverter {
 
     private static final GeoTiffFormat GEOTIF_FORMAT = new GeoTiffFormat();
 
@@ -71,18 +73,18 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
     String gdalTranslateExecutable = "gdal_translate";
 
     /**
-     * The GDAL_DATA folder
+     * The environment variables to set before invoking gdal_translate
      */
-    String gdalData = null;
+    Map<String, String> environment = null;
 
     /**
      * Map holding the descriptors of the supported GDAL formats (keyed by format name).
      */
-    static Map<String, GdalFormat> formats = new HashMap<String, GdalFormat>();
+    static Map<String, Format> formats = new HashMap<String, Format>();
     /**
      * Map holding the descriptors of the supported GDAL formats (keyed by mime type).
      */
-    static Map<String, GdalFormat> formatsByMimeType = new HashMap<String, GdalFormat>();
+    static Map<String, Format> formatsByMimeType = new HashMap<String, Format>();
 
     /**
      * Lock guarding concurrent access to the maps holding the format descriptors.
@@ -102,7 +104,8 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      * 
      * @return
      */
-    public String getGdalTranslateExecutable() {
+    @Override
+    public String getExecutable() {
         return gdalTranslateExecutable;
     }
 
@@ -111,7 +114,8 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      * 
      * @param gdalTranslate
      */
-    public void setGdalTranslateExecutable(String gdalTranslate) {
+    @Override
+    public void setExecutable(String gdalTranslate) {
         this.gdalTranslateExecutable = gdalTranslate;
     }
 
@@ -120,8 +124,9 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      * 
      * @return
      */
-    public String getGdalData() {
-        return gdalData;
+    @Override
+    public Map<String, String> getEnvironment() {
+        return environment;
     }
 
     /**
@@ -129,8 +134,9 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      * 
      * @param gdalData
      */
-    public void setGdalData(String gdalData) {
-        this.gdalData = gdalData;
+    @Override
+    public void setEnvironment(Map<String, String> environment) {
+        this.environment = environment;
     }
 
     /**
@@ -138,7 +144,8 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      * 
      * @param format
      */
-    public void addFormat(GdalFormat format) {
+    @Override
+    public void addFormat(Format format) {
         if (format == null) {
             throw new IllegalArgumentException("No format provided");
         }
@@ -151,10 +158,10 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
         }
     }
 
-    private void addFormatInternal(GdalFormat format) {
-        formats.put(format.formatName.toUpperCase(), format);
-        if (format.mimeType != null) {
-            formatsByMimeType.put(format.mimeType.toUpperCase(), format);
+    private void addFormatInternal(Format format) {
+        formats.put(format.getGeoserverFormat().toUpperCase(), format);
+        if (format.getMimeType() != null) {
+            formatsByMimeType.put(format.getMimeType().toUpperCase(), format);
         }
     }
 
@@ -163,10 +170,11 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      *
      * @return the list of supported formats
      */
-    public List<GdalFormat> getFormats() {
+    @Override
+    public List<Format> getFormats() {
         formatsLock.readLock().lock();
         try {
-            return new ArrayList<GdalFormat>(formats.values());
+            return new ArrayList<Format>(formats.values());
         } finally {
             formatsLock.readLock().unlock();
         }
@@ -175,6 +183,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
     /**
      * Programmatically removes all formats
      */
+    @Override
     public void clearFormats() {
         formatsLock.writeLock().lock();
         try {
@@ -194,7 +203,8 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
      *  
      * @param formats
      */
-    public void replaceFormats(List<GdalFormat> formats) {
+    @Override
+    public void replaceFormats(List<Format> formats) {
         if (formats == null || formats.isEmpty()) {
             throw new IllegalArgumentException("No formats provided");
         }
@@ -202,7 +212,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
         formatsLock.writeLock().lock();
         try {
             clearFormatsInternal();
-            for (GdalFormat format: formats) {
+            for (Format format: formats) {
                 if (format != null) {
                     addFormatInternal(format);
                 }
@@ -226,10 +236,10 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
     public String getMimeType(String outputFormat) {
         String mimeType = "";
 
-        GdalFormat format = getGdalFormat(outputFormat);
-        if (format.singleFile) {
-            if (format.mimeType != null) {
-                mimeType = format.mimeType;
+        Format format = getGdalFormat(outputFormat);
+        if (format.isSingleFile()) {
+            if (format.getMimeType() != null) {
+                mimeType = format.getMimeType();
             } else {
                 // use a default binary blob
                 mimeType = "application/octet-stream";
@@ -245,10 +255,10 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
     public String getFileExtension(String outputFormat) {
         String extension = "";
 
-        GdalFormat format = getGdalFormat(outputFormat);
-        if (format.singleFile) {
-            if (format.fileExtension != null) {
-                extension = format.fileExtension;
+        Format format = getGdalFormat(outputFormat);
+        if (format.isSingleFile()) {
+            if (format.getFileExtension() != null) {
+                extension = format.getFileExtension();
             } else {
                 // default to .bin
                 extension = "bin";
@@ -265,8 +275,8 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
         return extension;
     }
 
-    private GdalFormat getGdalFormat(String outputFormat) {
-        GdalFormat format = null;
+    private Format getGdalFormat(String outputFormat) {
+        Format format = null;
 
         formatsLock.readLock().lock();
         try {
@@ -293,7 +303,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
         Utilities.ensureNonNull("sourceCoverage", coverage);
 
         // figure out which output format we're going to generate
-        GdalFormat format = getGdalFormat(outputFormat);
+        Format format = getGdalFormat(outputFormat);
 
         // create the first temp directory, used for dumping gs generated
         // content
@@ -301,7 +311,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
         File tempGDAL = org.geoserver.data.util.IOUtils.createTempDirectory("gdaltmpout");
 
         // build the gdal wrapper used to run the gdal_translate commands
-        GdalWrapper wrapper = new GdalWrapper(gdalTranslateExecutable, gdalData);
+        GdalWrapper wrapper = new GdalWrapper(gdalTranslateExecutable, environment);
 
         // actually export the coverage
         try {
@@ -319,7 +329,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
             IOUtils.emptyDirectory(tempGS);
 
             // was it a single file output?
-            if(format.singleFile) {
+            if(format.isSingleFile()) {
                 try (FileInputStream fis = new FileInputStream(outputFile)) {
                     org.apache.commons.io.IOUtils.copy(fis, output);
                 }
@@ -400,7 +410,7 @@ public class GdalCoverageResponseDelegate implements CoverageResponseDelegate {
 
     @Override
     public boolean isAvailable() {
-        GdalWrapper gdal = new GdalWrapper(gdalTranslateExecutable, gdalData);
+        GdalWrapper gdal = new GdalWrapper(gdalTranslateExecutable, environment);
         return gdal.isAvailable();
     }
 

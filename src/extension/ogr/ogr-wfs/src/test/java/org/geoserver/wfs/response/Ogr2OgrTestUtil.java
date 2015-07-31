@@ -7,6 +7,7 @@ package org.geoserver.wfs.response;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +36,7 @@ public class Ogr2OgrTestUtil {
                     OGR2OGR = "ogr2ogr";
                 GDAL_DATA = p.getProperty("gdalData");
                 
-                OGRWrapper ogr = new OGRWrapper(OGR2OGR, GDAL_DATA);
+                OGRWrapper ogr = new OGRWrapper(OGR2OGR, Collections.singletonMap("GDAL_DATA", GDAL_DATA));
                 IS_OGR_AVAILABLE = ogr.isAvailable();
             } catch (Exception e) {
                 IS_OGR_AVAILABLE = false;

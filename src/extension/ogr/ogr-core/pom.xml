@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
- Copyright (C) 2014- 2015 Open Source Geospatial Foundation. All rights reserved.
+ Copyright (C) 2015 Open Source Geospatial Foundation. All rights reserved.
  This code is licensed under the GPL 2.0 license, available at the root
  application directory.
  -->
@@ -15,20 +15,11 @@
   </parent>
 
   <groupId>org.geoserver.extension</groupId>
-  <artifactId>gs-ogr-wfs</artifactId>
+  <artifactId>gs-ogr-core</artifactId>
   <packaging>jar</packaging>
-  <name>OGR WFS</name>
+  <name>OGR CORE</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.geoserver.extension</groupId>
-      <artifactId>gs-ogr-core</artifactId>
-      <version>${gs.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geoserver</groupId>
-      <artifactId>gs-wfs</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.geoserver</groupId>
       <artifactId>gs-main</artifactId>

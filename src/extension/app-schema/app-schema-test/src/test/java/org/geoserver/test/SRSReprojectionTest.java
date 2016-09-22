@@ -217,14 +217,8 @@ public class SRSReprojectionTest extends AbstractAppSchemaTestSupport {
         AppSchemaDataAccess da = (AppSchemaDataAccess) fs.getDataStore();
         FeatureTypeMapping rootMapping = da.getMappingByNameOrElement(ftInfo.getQualifiedName());
 
-        // make sure that:
-        // 1) backing datastore is JDBC
-        // 2) joining is enabled
-        // 3) nested filters encoding is enabled
-        // otherwise, skip test
-        assumeTrue(rootMapping.getSource().getDataStore() instanceof JDBCDataStore);
-        assumeTrue(AppSchemaDataAccessConfigurator.isJoining());
-        assumeTrue(AppSchemaDataAccessConfigurator.shouldEncodeNestedFilters());
+        // make sure nested filters encoding is enabled, otherwise skip test
+        assumeTrue(shouldTestNestedFiltersEncoding(rootMapping));
 
         JDBCDataStore store = (JDBCDataStore) rootMapping.getSource().getDataStore();
 

@@ -431,13 +431,11 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
         AppSchemaDataAccess da = (AppSchemaDataAccess) fs.getDataStore();
         FeatureTypeMapping rootMapping = da.getMappingByNameOrElement(ftInfo.getQualifiedName());
 
-        // make sure that: 1) backing datastore is JDBC 2) joining is enabled, otherwise skip test
-        assumeTrue(rootMapping.getSource().getDataStore() instanceof JDBCDataStore);
-        assumeTrue(AppSchemaDataAccessConfigurator.isJoining());
-        assumeTrue(AppSchemaDataAccessConfigurator.shouldEncodeNestedFilters());
+        // make sure nested filters encoding is enabled, otherwise skip test
+        assumeTrue(shouldTestNestedFiltersEncoding(rootMapping));
 
         JDBCDataStore store = (JDBCDataStore) rootMapping.getSource().getDataStore();
-        NestedFilterToSQL nestedFilterToSQL = createNestedFilter(rootMapping, store);
+        NestedFilterToSQL nestedFilterToSQL = createNestedFilterEncoder(rootMapping);
 
         FilterFactoryImplNamespaceAware ff = new FilterFactoryImplNamespaceAware();
         ff.setNamepaceContext(rootMapping.getNamespaces());
@@ -474,7 +472,7 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
 //                + "AND \"appschematest\".\"MAPPEDFEATUREWITHNESTEDNAME\".\"ID\" = \"chain_link_1\".\"MF_ID\")";
 //        assertEquals(expectedEncoded, encodedFilter);
         assertTrue(encodedFilter.contains("EXISTS"));
-        checkMappedFeatures(fs.getFeatures(propertyIsEqualTo), "mf3");
+        assertContainsFeatures(fs.getFeatures(propertyIsEqualTo), "mf3");
 
         /*
          * test filter on attribute of root feature type
@@ -501,7 +499,7 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
         String ordinaryEncoded = nestedFilterToSQL.encodeToString(unrolled);
 
         assertFalse(ordinaryEncoded.contains("EXISTS"));
-        checkMappedFeatures(fs.getFeatures(ordinaryFilter), "mf1");
+        assertContainsFeatures(fs.getFeatures(ordinaryFilter), "mf1");
 
         /*
          * test filter matching multiple mappings
@@ -525,7 +523,7 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
         // Filter is nested
         assertTrue(NestedFilterToSQL.isNestedFilter(unrolled));
 
-        checkMappedFeatures(fs.getFeatures(multipleFilter), "mf1");
+        assertContainsFeatures(fs.getFeatures(multipleFilter), "mf1");
 
         /*
          * test combined filter, i.e. a filter composed of a "regular" filter, and a nested filter
@@ -562,7 +560,7 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
 //                + "AND \"appschematest\".\"MAPPEDFEATUREWITHNESTEDNAME\".\"ID\" = \"chain_link_1\".\"MF_ID\"))";
 //        assertEquals(expected, encodedCombined);
         assertTrue(encodedCombined.contains("EXISTS"));
-        checkMappedFeatures(fs.getFeatures(combined), "mf1", "mf3");
+        assertContainsFeatures(fs.getFeatures(combined), "mf1", "mf3");
 
         /*
          * test filter comparing multiple nested attributes
@@ -586,38 +584,7 @@ public class SimpleAttributeFeatureChainWfsTest extends AbstractAppSchemaTestSup
         // Filter is nested
         assertTrue(NestedFilterToSQL.isNestedFilter(unrolled));
 
-        checkMappedFeatures(fs.getFeatures(notEquals), "mf1", "mf2", "mf3", "mf4");
-    }
-
-    private NestedFilterToSQL createNestedFilter(FeatureTypeMapping mapping, JDBCDataStore store) {
-        SQLDialect dialect = store.getSQLDialect();
-        FilterToSQL original = null;
-        if (dialect instanceof BasicSQLDialect) {
-            original = ((BasicSQLDialect) dialect).createFilterToSQL();
-        } else if (dialect instanceof PreparedStatementSQLDialect) {
-            original = ((PreparedStatementSQLDialect) dialect).createPreparedFilterToSQL();
-        }
-        original.setFeatureType((SimpleFeatureType) mapping.getSource().getSchema());
-
-        NestedFilterToSQL nestedFilterToSQL = new NestedFilterToSQL(mapping, original);
-        nestedFilterToSQL.setInline(true);
-        return nestedFilterToSQL;
-    }
-
-    private void checkMappedFeatures(FeatureCollection featureSet, String... fids) {
-        List<String> fidList = Arrays.asList(fids);
-
-        try (FeatureIterator it = featureSet.features()) {
-            int count = 0;
-            while (it.hasNext()) {
-                Feature f = it.next();
-                String[] parts = f.getIdentifier().getID().split("\\.");
-                String fid = parts[parts.length-1];
-                assertTrue(fidList.contains(fid));
-                count++;
-            }
-            assertEquals(fidList.size(), count);
-        }
+        assertContainsFeatures(fs.getFeatures(notEquals), "mf1", "mf2", "mf3", "mf4");
     }
 
     private void checkMf1(Document doc) {

@@ -1,0 +1,64 @@
+-- Schema
+
+DROP SCHEMA IF EXISTS hale_stations CASCADE;
+CREATE SCHEMA hale_stations AUTHORIZATION geosolutions;
+
+SET search_path TO hale_stations, public;
+
+-- Stations
+
+DROP TABLE IF EXISTS stations_gml32 CASCADE;
+CREATE TABLE stations_gml32 (
+	id integer primary key,
+	name varchar(50),
+	phone varchar(50),
+	mail varchar(50),
+	location geometry(Point, 4326)
+);
+
+INSERT INTO stations_gml32
+	(id, name, phone, mail, location)
+VALUES
+	('st.1', 'station1', '32154898', 'station1@stations.org', ST_SetSRID(ST_GeomFromText('POINT(8.63 44.92)'), 4326));
+
+
+-- Parameters
+
+DROP TABLE IF EXISTS meteo_parameters CASCADE;
+CREATE TABLE meteo_parameters (
+	id integer primary key,
+	param_name varchar(50),
+	param_unit varchar(10)
+);
+
+INSERT INTO meteo_parameters
+	(id, param_name, param_unit)
+VALUES
+	(1, 'temperature', 'C'),
+	(2, 'wind speed', 'Km/h'),
+	(3, 'pressure', 'hPa');
+
+
+-- Observations
+
+DROP TABLE IF EXISTS meteo_observations CASCADE;
+CREATE TABLE meteo_observations (
+	id serial primary key,
+	parameter_id integer not null,
+	station_id integer not null,
+	time timestamp without time zone,
+	value double precision,
+	CONSTRAINT fk_parameter FOREIGN KEY (parameter_id) REFERENCES meteo_parameters (id),
+	CONSTRAINT fk_station FOREIGN KEY (station_id) REFERENCES meteo_stations (id)
+);
+
+INSERT INTO meteo_observations
+	(parameter_id, station_id, time, value)
+VALUES
+	(1, 13, to_timestamp(1482146800), 20),
+	(2, 13, to_timestamp(1482146833), 155),
+	(1, 7, to_timestamp(1482146911), 35),
+	(1, 7, to_timestamp(1482146935), 25),
+	(2, 7, to_timestamp(1482146964), 80),
+	(3, 7, to_timestamp(1482147026), 1019),
+	(3, 7, to_timestamp(1482147051), 1015);

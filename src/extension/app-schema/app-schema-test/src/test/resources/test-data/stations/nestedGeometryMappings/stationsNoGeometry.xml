@@ -26,11 +26,11 @@
         <FeatureTypeMapping>
             <sourceDataStore>stations_${GML_PREFIX}</sourceDataStore>
             <sourceType>stations_${GML_PREFIX}</sourceType>
-            <targetElement>st_${GML_PREFIX}:Station_${GML_PREFIX}</targetElement>
-            <defaultGeometry>st_${GML_PREFIX}:location/st_${GML_PREFIX}:position</defaultGeometry>
+            <targetElement>st_${GML_PREFIX}:StationNoGeometry_${GML_PREFIX}</targetElement>
+            <defaultGeometry>st_${GML_PREFIX}:location/st_${GML_PREFIX}:code</defaultGeometry>
             <attributeMappings>
                 <AttributeMapping>
-                    <targetAttribute>st_${GML_PREFIX}:Station_${GML_PREFIX}</targetAttribute>
+                    <targetAttribute>st_${GML_PREFIX}:StationNoGeometry_${GML_PREFIX}</targetAttribute>
                     <idExpression>
                         <OCQL>ID</OCQL>
                     </idExpression>
@@ -42,15 +42,9 @@
                     </sourceExpression>
                 </AttributeMapping>
                 <AttributeMapping>
-                    <targetAttribute>st_${GML_PREFIX}:location/st_${GML_PREFIX}:name</targetAttribute>
+                    <targetAttribute>st_${GML_PREFIX}:code</targetAttribute>
                     <sourceExpression>
                         <OCQL>LOCATION</OCQL>
-                    </sourceExpression>
-                </AttributeMapping>
-                <AttributeMapping>
-                    <targetAttribute>st_${GML_PREFIX}:location/st_${GML_PREFIX}:position</targetAttribute>
-                    <sourceExpression>
-                        <OCQL>ST_POSITION</OCQL>
                     </sourceExpression>
                 </AttributeMapping>
             </attributeMappings>

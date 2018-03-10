@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema">
-  <namespaces>
+    <namespaces>
         <Namespace>
-	  <prefix>st_${GML_PREFIX}</prefix>
-	  <uri>http://www.stations_${GML_PREFIX}.org/1.0</uri>
-	</Namespace>
+            <prefix>st_${GML_PREFIX}</prefix>
+            <uri>http://www.stations_${GML_PREFIX}.org/1.0</uri>
+        </Namespace>
     </namespaces>
     <sourceDataStores>
         <DataStore>
-	  <id>stations_${GML_PREFIX}</id>
+            <id>stations_${GML_PREFIX}</id>
             <parameters>
                 <Parameter>
                     <name>directory</name>
@@ -19,7 +19,7 @@
     </sourceDataStores>
     <targetTypes>
         <FeatureType>
-	  <schemaUri>stations_${GML_PREFIX}.xsd</schemaUri>
+            <schemaUri>stations_${GML_PREFIX}.xsd</schemaUri>
         </FeatureType>
     </targetTypes>
     <typeMappings>

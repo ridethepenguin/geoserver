@@ -35,16 +35,16 @@ import java.util.Map;
 public class StationsMockData extends AbstractAppSchemaMockData {
 
     // stations GML 3.1 namespaces
-    protected static final String STATIONS_PREFIX_GML31 = "st_gml31";
-    protected static final String STATIONS_URI_GML31 = "http://www.stations_gml31.org/1.0";
-    protected static final String MEASUREMENTS_PREFIX_GML31 = "ms_gml31";
-    protected static final String MEASUREMENTS_URI_GML31 = "http://www.measurements_gml31.org/1.0";
+    static final String STATIONS_PREFIX_GML31 = "st_gml31";
+    static final String STATIONS_URI_GML31 = "http://www.stations_gml31.org/1.0";
+    static final String MEASUREMENTS_PREFIX_GML31 = "ms_gml31";
+    static final String MEASUREMENTS_URI_GML31 = "http://www.measurements_gml31.org/1.0";
 
     // stations GML 3.2 namespaces
-    protected static final String STATIONS_PREFIX_GML32 = "st_gml32";
-    protected static final String STATIONS_URI_GML32 = "http://www.stations_gml32.org/1.0";
-    protected static final String MEASUREMENTS_PREFIX_GML32 = "ms_gml32";
-    protected static final String MEASUREMENTS_URI_GML32 = "http://www.measurements_gml32.org/1.0";
+    static final String STATIONS_PREFIX_GML32 = "st_gml32";
+    static final String STATIONS_URI_GML32 = "http://www.stations_gml32.org/1.0";
+    static final String MEASUREMENTS_PREFIX_GML32 = "ms_gml32";
+    static final String MEASUREMENTS_URI_GML32 = "http://www.measurements_gml32.org/1.0";
 
     // directory that should contain all the new files created during the setup of this data set
     protected static final File TEST_ROOT_DIRECTORY;

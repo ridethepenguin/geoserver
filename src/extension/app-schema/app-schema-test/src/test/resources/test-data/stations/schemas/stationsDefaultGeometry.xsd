@@ -18,26 +18,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="StationNoGeometryType">
-    <xs:complexContent>
-      <xs:extension base="gml:AbstractFeatureType">
-        <xs:sequence>
-          <xs:element name="name" type="string"/>
-          <xs:element name="code" type="string"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="StationWithGeometryPropertyType">
-    <xs:complexContent>
-      <xs:extension base="gml:AbstractFeatureType">
-        <xs:sequence>
-          <xs:element name="name" type="string"/>
-          <xs:element name="location" type="gml:GeometryPropertyType"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:complexType name="StationWithMeasurementsType">
     <xs:complexContent>
       <xs:extension base="gml:AbstractFeatureType">
@@ -57,8 +37,6 @@
   </xs:complexType>
 
   <xs:element name="Station_${GML_PREFIX}" type="st:StationType" substitutionGroup="gml:AbstractFeature"/>
-  <xs:element name="StationNoGeometry_${GML_PREFIX}" type="st:StationNoGeometryType" substitutionGroup="gml:AbstractFeature"/>
-  <xs:element name="StationWithGeometryProperty_${GML_PREFIX}" type="st:StationWithGeometryPropertyType" substitutionGroup="gml:AbstractFeature"/>
   <xs:element name="StationWithMeasurements_${GML_PREFIX}" type="st:StationWithMeasurementsType" substitutionGroup="gml:AbstractFeature"/>
 
 </xs:schema>

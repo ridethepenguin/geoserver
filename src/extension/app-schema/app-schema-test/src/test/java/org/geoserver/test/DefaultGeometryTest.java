@@ -284,6 +284,42 @@ public class DefaultGeometryTest extends AbstractAppSchemaTestSupport {
         }
     }
 
+    @Test
+    public void testWmsGetFeatureInfoDefaultGeometry() throws Exception {
+        testWmsGetFeatureInfo(STATION_FEATURE, "Default_Point", 89, 114, XPATH_STATION,
+                XPATH_STATION_FAKE_GEOM, XPATH_STATION_GEOM);
+    }
+
+    @Test
+    public void testWmsGetFeatureInfoDefaultGeometryInChainedFeature() throws Exception {
+        testWmsGetFeatureInfo(STATION_WITH_MEASUREMENTS_FEATURE, "Default_Polygon", 125, 150,
+                XPATH_STATION_WITH_MEASUREMENTS, XPATH_STATION_WITH_MEASUREMENTS_FAKE_GEOM,
+                XPATH_STATION_WITH_MEASUREMENTS_GEOM);
+    }
+
+    public void testWmsGetFeatureInfo(String layer, String style, int x, int y, String xpathFeature,
+            String xpathFakeGeom, String xpathActualGeom) throws Exception {
+        XpathEngine xpathEngine = WFS11_XPATH_ENGINE;
+        String getFeatureUrl = buildGetFeatureInfoUrl(layer.replace("${GML_PREFIX}", GML31_PREFIX),
+                style, "application/vnd.ogc.gml/3.1.1", x, y);
+        Document document = getAsDOM(getFeatureUrl);
+
+        String xpath = null;
+        try {
+            xpath = XPATH_BASE_GML31 + xpathFeature.replace("${GML_PREFIX}", GML31_PREFIX);
+            assertEquals(1, xpathEngine.getMatchingNodes(xpath, document).getLength());
+            // attribute specified as default geometry must be encoded
+            xpath = XPATH_BASE_GML31 + xpathActualGeom.replace("${GML_PREFIX}", GML31_PREFIX);
+            assertEquals(1, xpathEngine.getMatchingNodes(xpath, document).getLength());
+            // fake default geometry attribute must not be encoded, as it's not present
+            // in the XML schema type
+            xpath = XPATH_BASE_GML31 + xpathFakeGeom.replace("${GML_PREFIX}", GML31_PREFIX);
+            assertEquals(0, xpathEngine.getMatchingNodes(xpath, document).getLength());
+        } catch (Exception exception) {
+            throw new RuntimeException("Error evaluating xpath.", exception);
+        }
+    }
+
     public String buildGetFeatureUrl(String wfsVersion, String featureType) {
         String getFeatureUrl = new StringBuilder().append("wfs?request=GetFeature").append("&")
                 .append("version=").append(wfsVersion).append("&").append("typename=")
@@ -300,5 +336,17 @@ public class DefaultGeometryTest extends AbstractAppSchemaTestSupport {
                 .append("FORMAT=image/png").toString();
 
         return getMapUrl;
+    }
+
+    public String buildGetFeatureInfoUrl(String layers, String style, String format, int x, int y) {
+        String getInfoUrl = new StringBuilder().append("wms?request=GetFeatureInfo").append("&")
+                .append("SRS=EPSG:4326").append("&").append("BBOX=-10,-10,10,10").append("&")
+                .append("STYLES=").append(style).append("&").append("LAYERS=").append(layers)
+                .append("&").append("QUERY_LAYERS=").append(layers).append("&").append("X=")
+                .append(x).append("&").append("Y=").append(y).append("&").append("WIDTH=256")
+                .append("&").append("HEIGHT=256").append("&").append("INFO_FORMAT=").append(format)
+                .toString();
+
+        return getInfoUrl;
     }
 }
